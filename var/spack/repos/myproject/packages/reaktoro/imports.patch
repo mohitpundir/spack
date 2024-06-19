@@ -1,0 +1,11 @@
+diff --git a/python/package/reaktoro/__init__.py b/python/package/reaktoro/__init__.py
+index 10e62e89..85c3798a 100644
+--- a/python/package/reaktoro/__init__.py
++++ b/python/package/reaktoro/__init__.py
+@@ -1,6 +1,3 @@
+ from reaktoro.reaktoro4py import *
+ from reaktoro.extensions import *
+ from reaktoro.version import __version__
+-
+-import autodiff
+-import optima

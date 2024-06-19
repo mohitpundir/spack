@@ -1,0 +1,27 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1931957..b863a4d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -68,7 +68,8 @@ add_subdirectory(Optima)
+ 
+ # Build the python wrappers
+ if(OPTIMA_BUILD_PYTHON)
+-    find_package(Python COMPONENTS Interpreter Development)
++    set(Python3_FIND_STRATEGY LOCATION)
++    find_package(Python3 COMPONENTS Interpreter Development)
+     find_package(pybind11 REQUIRED)
+     find_program(PYBIND11_STUBGEN pybind11-stubgen)
+     if(NOT pybind11_FOUND)
+diff --git a/python/package/CMakeLists.txt b/python/package/CMakeLists.txt
+index f5c1907..9b255c9 100644
+--- a/python/package/CMakeLists.txt
++++ b/python/package/CMakeLists.txt
+@@ -19,7 +19,7 @@ add_custom_target(optima-setuptools ALL
+     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Optima> optima
+     COMMAND ${STUBGEN_COMMAND1}
+     COMMAND ${STUBGEN_COMMAND2}
+-    COMMAND ${Python_EXECUTABLE} setup.py --quiet build --force
++    COMMAND ${Python3_EXECUTABLE} setup.py --quiet build --force
+     COMMAND ${CMAKE_COMMAND} -E rm optima/$<TARGET_FILE_NAME:optima4py>
+     COMMAND ${CMAKE_COMMAND} -E rm optima/$<TARGET_FILE_NAME:Optima>
+     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

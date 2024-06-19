@@ -1,0 +1,57 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -60,13 +60,16 @@ if(AUTODIFF_BUILD_TESTS)
+     add_subdirectory(tests)
+ endif()
+ 
+ # Build the python wrappers
+ if(AUTODIFF_BUILD_PYTHON)
+-    find_package(Python COMPONENTS Interpreter Development)
+-    find_package(pybind11 REQUIRED)
++    set(Python3_FIND_STRATEGY LOCATION)
++    find_package(Python3 COMPONENTS Interpreter Development)
++    find_package(pybind11 2.2.0 REQUIRED)
+     add_subdirectory(python)
+ endif()
+ 
++message(Python3_EXECUTABLE="${Python3_EXECUTABLE}")
++
+ # Build the examples
+ if(AUTODIFF_BUILD_EXAMPLES)
+     add_subdirectory(examples)
+
+--- a/python/package/CMakeLists.txt
++++ b/python/package/CMakeLists.txt
+@@ -1,10 +1,29 @@
+ # Configure the setup.py file
+-configure_file(setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
++#configure_file(setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
++
++# Copy the reaktoro directory to the binary directory
++file(COPY . DESTINATION ${CMAKE_CURRENT_BINARY_DIR})# FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
++
++# Define a variable with the name of the compiled python module file as defined by pybind11 (which is used in the file setup.py.in)
++#set(REAKTORO_PYTHON_MODULE_FILENAME PyReaktoro${PYTHON_MODULE_EXTENSION})
++
++# Configure the setup.py file
++set(SETUP_PY_IN ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in)
++set(SETUP_PY ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
++
++# Configure the setup.py script with the provided CMake variables
++configure_file(${SETUP_PY_IN} ${SETUP_PY})
++
++#file(
++#    COPY ${SETUP_PY}
++#    DESTINATION  ${CMAKE_CURRENT_BINARY_DIR}
++#    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
++#    )
+ 
+ # Create a custom target to build the python package during build stage
+ add_custom_target(autodiff-setuptools ALL
+     DEPENDS autodiff4py
+     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/autodiff ${CMAKE_CURRENT_BINARY_DIR}/autodiff
+     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:autodiff4py> ${CMAKE_CURRENT_BINARY_DIR}/autodiff
+-    COMMAND ${PYTHON_EXECUTABLE} setup.py --quiet build --force
++    COMMAND ${Python3_EXECUTABLE} ${SETUP_PY} --quiet build --force
+     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/autodiff/$<TARGET_FILE_NAME:autodiff4py>
+     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
